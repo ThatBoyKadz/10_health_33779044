@@ -72,7 +72,7 @@ router.post('/login', (req, res) => {
                 last: user.last
             };
 
-            res.redirect('./'); // redirect to home after login
+            res.redirect('/'); // redirect to home after login
         }
     );
 });
