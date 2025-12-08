@@ -37,7 +37,8 @@ app.use((req, res, next) => {
 // -----------------
 // App locals
 // -----------------
-app.locals.appName = "Health & Fitness Hub";
+app.locals.shopData = { shopName: "Health & Fitness Hub" };
+
 
 // -----------------
 // Database
