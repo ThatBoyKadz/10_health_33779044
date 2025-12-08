@@ -1,0 +1,6 @@
+body { font-family: Arial; background: #f4f4f4; padding: 20px; }
+table { border-collapse: collapse; width: 80%; margin-bottom: 20px; }
+th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+th { background: #3498db; color: white; }
+nav a { margin-right: 10px; text-decoration: none; color: #3498db; }
+nav a:hover { text-decoration: underline; }
