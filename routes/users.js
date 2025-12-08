@@ -2,33 +2,36 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 
-// Show registration page
+// --- Registration page ---
 router.get('/register', (req, res) => {
-    res.render('users/register');
+    res.render('users/register', { errors: [] });
 });
 
-// Handle registration form
+// --- Handle registration ---
 router.post('/register', async (req, res) => {
     const { username, password, first, last, email } = req.body;
+    const db = req.db;
 
-    // Check if user exists
+    if (!username || !password || !first || !last || !email) {
+        return res.render('users/register', { errors: ['All fields are required'] });
+    }
+
     db.query(
         'SELECT * FROM users WHERE username = ? OR email = ?',
         [username, email],
         async (err, results) => {
             if (err) throw err;
+
             if (results.length > 0) {
-                return res.send('Username or email already exists');
+                return res.render('users/register', { errors: ['Username or email already exists'] });
             }
 
-            // Hash password
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            // Insert user
             db.query(
                 'INSERT INTO users (username, password, first, last, email) VALUES (?, ?, ?, ?, ?)',
                 [username, hashedPassword, first, last, email],
-                (err2, results2) => {
+                (err2) => {
                     if (err2) throw err2;
                     res.redirect('/users/login');
                 }
@@ -37,47 +40,43 @@ router.post('/register', async (req, res) => {
     );
 });
 
-// Show login page
+// --- Login page ---
 router.get('/login', (req, res) => {
-    res.render('users/login');
+    res.render('users/login', { errors: [] });
 });
 
-// Handle login
+// --- Handle login ---
 router.post('/login', (req, res) => {
     const { username, password } = req.body;
+    const db = req.db;
 
-    db.query(
-        'SELECT * FROM users WHERE username = ?',
-        [username],
-        async (err, results) => {
-            if (err) throw err;
+    db.query('SELECT * FROM users WHERE username = ?', [username], async (err, results) => {
+        if (err) throw err;
 
-            if (results.length === 0) {
-                return res.send('Invalid credentials');
-            }
-
-            const user = results[0];
-
-            // Compare password
-            const match = await bcrypt.compare(password, user.password);
-            if (!match) {
-                return res.send('Invalid credentials');
-            }
-
-            // Store user in session
-            req.session.user = {
-                id: user.id,
-                username: user.username,
-                first: user.first,
-                last: user.last
-            };
-
-            res.redirect('/'); // redirect to home after login
+        if (results.length === 0) {
+            return res.render('users/login', { errors: ['Invalid credentials'] });
         }
-    );
+
+        const user = results[0];
+        const match = await bcrypt.compare(password, user.password);
+
+        if (!match) {
+            return res.render('users/login', { errors: ['Invalid credentials'] });
+        }
+
+        // Store user in session
+        req.session.user = {
+            id: user.id,
+            username: user.username,
+            first: user.first,
+            last: user.last
+        };
+
+        res.redirect('/'); // redirect to home after login
+    });
 });
 
-// Handle logout
+// --- Logout ---
 router.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
