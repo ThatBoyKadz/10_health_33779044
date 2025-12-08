@@ -56,9 +56,6 @@ app.use('/users', usersRoutes);
 const workoutsRoutes = require('./routes/workouts');
 app.use('/workouts', workoutsRoutes);
 
-const weatherRoutes = require('./routes/weather');
-app.use('/weather', weatherRoutes);
-
 // -----------------
 // Start server
 // -----------------
