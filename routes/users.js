@@ -64,7 +64,6 @@ router.post('/login', (req, res) => {
             return res.render('users/login', { errors: ['Invalid credentials'] });
         }
 
-        // Store user in session
         req.session.user = {
             id: user.id,
             username: user.username,
@@ -72,9 +71,18 @@ router.post('/login', (req, res) => {
             last: user.last
         };
 
-        res.redirect('/'); // redirect to home after login
+        // redirect to logged-in page
+        res.redirect('/users/loggedin');
     });
 });
+
+router.get('/loggedin', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect('/users/login');
+    }
+    res.render('users/loggedin');
+});
+
 
 // --- Logout ---
 router.get('/logout', (req, res) => {

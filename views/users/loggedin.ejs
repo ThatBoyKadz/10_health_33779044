@@ -1,0 +1,9 @@
+<%- include('../partials/header') %>
+
+<h1>Welcome <%= session.user.first %> <%= session.user.last %>!</h1>
+<p>You are now logged in.</p>
+
+<a href="/workouts/list">Go to Workouts</a><br>
+<a href="/users/logout">Logout</a>
+
+<%- include('../partials/footer') %>
