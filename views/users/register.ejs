@@ -1,53 +1,19 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Register for <%= shopData.shopName %></title>
-    <link rel="stylesheet" type="text/css" href="/main.css" />
-    <style>
-      .errors { color: red; margin-bottom: 1em; }
-      .errors li { margin: 0.3em 0; }
-    </style>
-  </head>
-  <body>
-    <h1>Register for <%= shopData.shopName %></h1>
+<h2>Register</h2>
+<form action="/users/register" method="POST">
+    <label>First Name:</label>
+    <input type="text" name="first" required><br>
 
-    <!-- Display validation errors -->
-    <% if (errors && errors.length > 0) { %>
-      <ul class="errors">
-        <% errors.forEach(function(error) { %>
-          <li><%= error.msg %></li>
-        <% }); %>
-      </ul>
-    <% } %>
+    <label>Last Name:</label>
+    <input type="text" name="last" required><br>
 
-    <form method="POST" action="registered">
+    <label>Username:</label>
+    <input type="text" name="username" required><br>
 
-      <p>Username:
-        <input id="username" type="text" name="username" required
-               value="<%= oldInput ? oldInput.username : '' %>" />
-      </p>
+    <label>Email:</label>
+    <input type="email" name="email" required><br>
 
-      <p>Password:
-        <input id="password" type="password" name="password" required />
-      </p>
+    <label>Password:</label>
+    <input type="password" name="password" required><br>
 
-      <p>First name:
-        <input id="first" type="text" name="first" required
-               value="<%= oldInput ? oldInput.first : '' %>" />
-      </p>
-
-      <p>Last name:
-        <input id="last" type="text" name="last" required
-               value="<%= oldInput ? oldInput.last : '' %>" />
-      </p>
-
-      <p>Email:
-        <input id="email" type="email" name="email" required
-               value="<%= oldInput ? oldInput.email : '' %>" />
-      </p>
-
-      <input type="submit" value="Register" />
-    </form>
-
-  </body>
-</html>
+    <button type="submit">Register</button>
+</form>

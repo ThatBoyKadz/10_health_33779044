@@ -1,14 +1,13 @@
-require('dotenv').config(); // Load environment variables
-
+require('dotenv').config();
 const express = require('express');
 const ejs = require('ejs');
 const path = require('path');
 const mysql = require('mysql2');
 const session = require('express-session');
 const expressSanitizer = require('express-sanitizer');
+
 const app = express();
 const port = 8000;
-const host = '0.0.0.0'; // Listen on all interfaces
 
 // -----------------
 // Middleware
@@ -25,27 +24,20 @@ app.use(session({
     cookie: { expires: 600000 }
 }));
 
-// Make session available in all templates
-app.use((req, res, next) => {
-    res.locals.session = req.session;
-    next();
-});
-
 // -----------------
-// App locals
+// App locals for EJS
 // -----------------
+app.locals.shopData = { shopName: "Bertie's Health & Fitness" };
 app.locals.appName = "Health & Fitness Hub";
-app.locals.shopData = { shopName: "Health & Fitness Hub" };
 
 // -----------------
 // Database
 // -----------------
-// Change host if your MySQL is on another machine
 const db = mysql.createPool({
-    host: 'localhost', // or the IP of your VM MySQL if remote
-    user: 'fitness_app_user',
-    password: 'strongpassword', // match your VM credentials
-    database: 'health',
+    host: 'localhost',
+    user: 'fitness_app_user',   // make sure this user exists on your VM
+    password: 'strongpassword', // update if needed
+    database: 'health',         // your VM database name
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
@@ -64,8 +56,13 @@ app.use('/users', usersRoutes);
 const workoutsRoutes = require('./routes/workouts');
 app.use('/workouts', workoutsRoutes);
 
+const apiRoutes = require('./routes/api');
+app.use('/api', apiRoutes);
+
+const weatherRoutes = require('./routes/weather');
+app.use('/weather', weatherRoutes);
 
 // -----------------
 // Start server
 // -----------------
-app.listen(port, host, () => console.log(`Server listening on http://${host}:${port}`));
+app.listen(port, () => console.log(`Server listening on http://localhost:${port}`));
