@@ -1,0 +1,34 @@
+<%- include('partials/header') %>
+
+<h1>Search Results</h1>
+
+<% if (workouts.length === 0) { %>
+    <p>No workouts found matching your search.</p>
+<% } else { %>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Duration (min)</th>
+                <th>Difficulty</th>
+                <th>Calories Burned</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% workouts.forEach(function(workout) { %>
+                <tr>
+                    <td><%= workout.name %></td>
+                    <td><%= workout.type %></td>
+                    <td><%= workout.duration %></td>
+                    <td><%= workout.difficulty %></td>
+                    <td><%= workout.calories_burned %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<% } %>
+
+<a href="/workouts/search">Back to Search</a>
+
+<%- include('partials/footer') %>
