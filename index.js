@@ -64,8 +64,6 @@ app.use('/users', usersRoutes);
 const workoutsRoutes = require('./routes/workouts');
 app.use('/workouts', workoutsRoutes);
 
-const apiRoutes = require('./routes/api');
-app.use('/api', apiRoutes); // all API routes start with /api
 
 // -----------------
 // Start server
