@@ -80,7 +80,7 @@ router.get('/loggedin', (req, res) => {
     if (!req.session.user) {
         return res.redirect('/users/login');
     }
-    res.render('users/loggedin');
+    res.redirect('users/loggedin');
 });
 
 
