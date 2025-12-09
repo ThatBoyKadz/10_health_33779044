@@ -1,89 +1,139 @@
-const express = require('express');
+// routes/users.js
+const express = require("express");
 const router = express.Router();
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
-// --- Show registration page ---
-router.get('/register', (req, res) => {
-    res.render('users/register', { errors: [] });
-});
+// express-validator
+const { check, validationResult } = require("express-validator");
 
-// --- Handle registration form ---
-router.post('/register', async (req, res) => {
-    const { username, password, first, last, email } = req.body;
-    const db = req.db;
+// ------------------------
+// Middleware: Protect routes
+// ------------------------
+const redirectLogin = (req, res, next) => {
+    if (!req.session.userId) {
+        res.redirect("/users/login");
+    } else {
+        next();
+    }
+};
 
-    db.query(
-        'SELECT * FROM users WHERE username = ? OR email = ?',
-        [username, email],
-        async (err, results) => {
-            if (err) throw err;
-
-            if (results.length > 0) {
-                return res.render('users/register', { errors: ['Username or email already exists'] });
-            }
-
-            const hashedPassword = await bcrypt.hash(password, 10);
-
-            db.query(
-                'INSERT INTO users (username, password, first, last, email) VALUES (?, ?, ?, ?, ?)',
-                [username, hashedPassword, first, last, email],
-                (err2, results2) => {
-                    if (err2) throw err2;
-                    res.redirect('/users/login');
-                }
-            );
-        }
-    );
-});
-
-// --- Show login page ---
-router.get('/login', (req, res) => {
-    res.render('users/login', { errors: [] });
-});
-
-// --- Handle login ---
-router.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    const db = req.db;
-
-    db.query('SELECT * FROM users WHERE username = ?', [username], async (err, results) => {
-        if (err) throw err;
-
-        if (results.length === 0) {
-            return res.render('users/login', { errors: ['Invalid credentials'] });
-        }
-
-        const user = results[0];
-        const match = await bcrypt.compare(password, user.password);
-
-        if (!match) {
-            return res.render('users/login', { errors: ['Invalid credentials'] });
-        }
-
-        // Store user in session
-        req.session.user = {
-            id: user.id,
-            username: user.username,
-            first: user.first,
-            last: user.last
-        };
-
-        res.redirect('/users/loggedin'); // Redirect to loggedin page
+// ------------------------
+// GET: Registration Page
+// ------------------------
+router.get("/register", (req, res) => {
+    res.render("register.ejs", { 
+        errors: [], 
+        oldInput: {} 
     });
 });
 
-// --- Logged-in page ---
-router.get('/loggedin', (req, res) => {
-    if (!req.session.user) {
-        return res.redirect('/users/login');
+// ------------------------
+// POST: Handle Registration
+// ------------------------
+router.post(
+    "/register",
+    [
+        check("email").isEmail().withMessage("Please enter a valid email."),
+        check("username").isLength({ min: 5, max: 20 }).withMessage("Username must be 5–20 characters."),
+        check("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters."),
+        check("first").notEmpty().withMessage("First name is required."),
+        check("last").notEmpty().withMessage("Last name is required.")
+    ],
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.render("register.ejs", {
+                errors: errors.array(),
+                oldInput: req.body
+            });
+        }
+
+        // Sanitize inputs
+        const username = req.sanitize(req.body.username);
+        const password = req.sanitize(req.body.password);
+        const first = req.sanitize(req.body.first);
+        const last = req.sanitize(req.body.last);
+        const email = req.sanitize(req.body.email);
+
+        bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+            if (err) return next(err);
+
+            const sql = `
+                INSERT INTO users (username, first, last, email, hashedPassword)
+                VALUES (?, ?, ?, ?, ?)
+            `;
+            const params = [username, first, last, email, hashedPassword];
+
+            db.query(sql, params, (err, result) => {
+                if (err) return next(err);
+                // Redirect to login after registration
+                res.redirect("/users/login");
+            });
+        });
     }
-    res.render('users/loggedin', { user: req.session.user });
+);
+
+// ------------------------
+// GET: Login Page
+// ------------------------
+router.get("/login", (req, res) => {
+    res.render("login.ejs", { errors: [] });
 });
 
-// --- Logout ---
-router.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/');
+// ------------------------
+// POST: Handle Login
+// ------------------------
+router.post("/login", (req, res, next) => {
+    const usernameInput = req.sanitize(req.body.username);
+    const passwordInput = req.sanitize(req.body.password);
+
+    const sql = "SELECT id, hashedPassword, first, last FROM users WHERE username = ?";
+    db.query(sql, [usernameInput], (err, results) => {
+        if (err) return next(err);
+
+        if (results.length === 0) {
+            return res.render("login.ejs", { errors: [{ msg: "Username not found" }] });
+        }
+
+        const user = results[0];
+        const success = bcrypt.compareSync(passwordInput, user.hashedPassword);
+
+        if (success) {
+            req.session.userId = user.id;
+            req.session.username = usernameInput;
+            req.session.first = user.first;
+            req.session.last = user.last;
+
+            // Redirect to loggedin.ejs instead of dashboard
+            res.redirect("/users/loggedin");
+        } else {
+            res.render("login.ejs", { errors: [{ msg: "Incorrect password" }] });
+        }
+    });
+});
+
+// ------------------------
+// GET: Logout (protected)
+// ------------------------
+router.get("/logout", redirectLogin, (req, res) => {
+    req.session.destroy(err => {
+        if (err) return res.redirect("/users/loggedin");
+        res.clearCookie("connect.sid");
+        res.redirect("/users/login");
+    });
+});
+
+// ------------------------
+// GET: Logged In Page (protected)
+// ------------------------
+router.get("/loggedin", redirectLogin, (req, res) => {
+    res.render("loggedin.ejs", {
+        username: req.session.username,
+        first: req.session.first,
+        last: req.session.last,
+        message: "You are successfully logged in!"
+    });
 });
 
 module.exports = router;

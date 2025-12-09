@@ -1,6 +1,91 @@
-<%- include('partials/header') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Tracker App</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
+        }
+        header {
+            background: #4CAF50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        nav {
+            margin: 1rem;
+            text-align: center;
+        }
+        nav a {
+            margin: 0 1rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            margin-top: 1.5rem;
+            background: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .cta-button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
 
-<h1>Welcome to <%= appName %></h1>
-<p>This is your Health & Fitness App. Manage workouts and track progress!</p>
+<header>
+    <h1>Welcome to Your Health Tracker</h1>
+</header>
 
-<%- include('partials/footer') %>
+<nav>
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <% if (!session.userId) { %>
+        <a href="/users/login">Login</a>
+        <a href="/users/register">Register</a>
+        <% } else { %>
+        <a  href="/health/add">Add New Health Record</a>
+        <a  href="/health">View Health Records</a>
+        <a href="/users/logout">Logout</a>
+    <% } %>
+</nav>
+
+
+<div class="container">
+    <% if (!session.userId) { %>
+        <h2>Track Your Health Effortlessly</h2>
+        <p>Monitor your weight, BMI, blood pressure, exercises, and more—all in one place.</p>
+        <a class="cta-button" href="/users/register">Get Started</a>
+    <% } else { %>
+        <h2>Welcome back, <%= session.first %>!</h2>
+        <p>Go to your dashboard to view your health records and exercise logs.</p>
+        
+    <% } %>
+</div>
+
+</body>
+</html>

@@ -8,7 +8,6 @@ const session = require('express-session');
 const expressSanitizer = require('express-sanitizer');
 const app = express();
 const port = 8000;
-const host = '0.0.0.0'; // Listen on all interfaces
 
 // -----------------
 // Middleware
@@ -18,6 +17,7 @@ app.use(expressSanitizer());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
+
 app.use(session({
     secret: 'somerandomstuff',
     resave: false,
@@ -25,27 +25,18 @@ app.use(session({
     cookie: { expires: 600000 }
 }));
 
-// Make session available in all templates
 app.use((req, res, next) => {
     res.locals.session = req.session;
     next();
 });
-
-// -----------------
-// App locals
-// -----------------
-app.locals.appName = "Health & Fitness Hub";
-app.locals.shopData = { shopName: "Health & Fitness Hub" };
-
 // -----------------
 // Database
 // -----------------
-// Change host if your MySQL is on another machine
 const db = mysql.createPool({
-    host: 'localhost', // or the IP of your VM MySQL if remote
-    user: 'fitness_app_user',
-    password: 'strongpassword', // match your VM credentials
-    database: 'health',
+    host: 'localhost',
+    user: 'health_app_user', // your DB user
+    password: 'yourpassword', // your DB password
+    database: 'health', // health database
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
@@ -61,11 +52,14 @@ app.use('/', mainRoutes);
 const usersRoutes = require('./routes/users');
 app.use('/users', usersRoutes);
 
-const workoutsRoutes = require('./routes/workouts');
-app.use('/workouts', workoutsRoutes);
+const healthRoutes = require('./routes/health'); // CRUD for health records
+app.use('/health', healthRoutes);
+
+//const exercisesRoutes = require('./routes/exercises'); // CRUD for exercise logs
+//app.use('/exercises', exercisesRoutes);
 
 
 // -----------------
 // Start server
 // -----------------
-app.listen(port, host, () => console.log(`Server listening on http://${host}:${port}`));
+app.listen(port, () => console.log(`Health app server listening on port ${port}!`));

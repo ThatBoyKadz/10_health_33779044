@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Health Record</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h1>Add Health Record</h1>
+
+    <p>
+        <a href="/health">Back to Records</a> | 
+        <a href="/users/logout">Logout</a>
+        <a class="button" href="/">return home</a>
+    </p>
+
+    <form action="/health/add" method="POST">
+        <label>Weight (kg):
+            <input type="number" step="0.1" name="weight" required>
+        </label>
+        <br><br>
+        <label>Height (cm):
+            <input type="number" step="0.1" name="height" required>
+        </label>
+        <br><br>
+        <label>Blood Pressure:
+            <input type="text" name="blood_pressure" required>
+        </label>
+        <br><br>
+        <label>Heart Rate:
+            <input type="number" name="heart_rate" required>
+        </label>
+        <br><br>
+        <button type="submit">Add Record</button>
+    </form>
+</body>
+</html>

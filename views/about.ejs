@@ -1,6 +1,49 @@
-<%- include('partials/header') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About - Health App</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <h1>About This Health App</h1>
+        <nav>
+            <a href="/">Home</a> |
+            <% if (!session.userId) { %>
+                <a href="/users/login">Login</a> |
+                <a href="/users/register">Register</a>
+            <% } else { %>
+                <a href="/users/loggedin">Profile</a> |
+                <a href="/users/logout">Logout</a>
+            <% } %>
+        </nav>
+    </header>
 
-<h1>About</h1>
-<p>This Health & Fitness App allows you to track workouts and manage progress.</p>
+    <main>
+        <section>
+            <h2>Our Mission</h2>
+            <p>This app helps you track your health records, including weight, height, BMI, blood pressure, and heart rate. Stay informed and maintain a healthy lifestyle!</p>
+        </section>
 
-<%- include('partials/footer') %>
+        <section>
+            <h2>Features</h2>
+            <ul>
+                <li>Track your health records over time</li>
+                <li>Calculate BMI automatically</li>
+                <li>Secure login and personal dashboard</li>
+                <li>Add new health records easily</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Contact</h2>
+            <p>If you have questions or feedback, reach us at <a href="mailto:support@healthapp.com">support@healthapp.com</a>.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Health App. All rights reserved.</p>
+    </footer>
+</body>
+</html>

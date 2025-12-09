@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Health Records</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h1>My Health Records</h1>
+
+    <p>Welcome, <%= session.first || '' %> <%= session.last || '' %>! | 
+       <a href="/users/logout">Logout</a> | 
+       <a href="/health/add">Add New Record</a>
+       <a class="button" href="/">return home</a>
+    </p>
+
+    <% if (records.length === 0) { %>
+        <p>No health records yet. <a href="/health/add">Add one</a>.</p>
+    <% } else { %>
+        <table border="1" cellpadding="5" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Weight (kg)</th>
+                    <th>Height (cm)</th>
+                    <th>BMI</th>
+                    <th>Blood Pressure</th>
+                    <th>Heart Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% records.forEach(record => { %>
+                    <tr>
+                        <td><%= record.record_date.toISOString().split('T')[0] %></td>
+                        <td><%= record.weight %></td>
+                        <td><%= record.height %></td>
+                        <td><%= record.bmi %></td>
+                        <td><%= record.blood_pressure %></td>
+                        <td><%= record.heart_rate %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } %>
+</body>
+</html>
