@@ -11,8 +11,8 @@
 
     <p>
         Welcome, <%= first || '' %> <%= last || '' %>! | 
-        <a href="<%= req.baseUrl.replace('/health','/users') %>/logout">Logout</a> | 
-        <a href="<%= req.baseUrl %>/add">Add New Record</a>
+        <a href="<%= logoutUrl %>">Logout</a> | 
+        <a href="<%= addUrl %>">Add New Record</a>
     </p>
 
     <% if (records.length === 0) { %>

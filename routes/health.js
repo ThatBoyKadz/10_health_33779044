@@ -1,15 +1,19 @@
 const express = require('express');
 const router = express.Router();
 
-// Show all health records
+// ------------------------
+// GET: Show all health records
+// ------------------------
 router.get('/', (req, res) => {
     if (!req.session || !req.session.userId) {
-        // Not logged in: show empty page or message
+        // Not logged in: show empty page with message
         return res.render('health', { 
             records: [],
             first: '',
             last: '',
-            message: 'Please log in to view your health records.'
+            message: 'Please log in to view your health records.',
+            logoutUrl: '/users/logout',
+            addUrl: '/health/add'
         });
     }
 
@@ -20,29 +24,32 @@ router.get('/', (req, res) => {
             if (err) throw err;
             res.render('health', { 
                 records: results,
-                first: req.session.first,
-                last: req.session.last,
-                message: ''
+                first: req.session.first || '',
+                last: req.session.last || '',
+                message: '',
+                logoutUrl: '/users/logout',
+                addUrl: '/health/add'
             });
         }
     );
 });
 
-// Add health record form
+// ------------------------
+// GET: Add health record form
+// ------------------------
 router.get('/add', (req, res) => {
     if (!req.session || !req.session.userId) {
-        return res.send('You must be logged in to add a record.');
+        return res.redirect('../users/login'); // redirect to login
     }
     res.render('add_record'); 
 });
 
-// Handle adding health record
-// Handle adding health record
-// Handle adding health record
+// ------------------------
+// POST: Handle adding health record
+// ------------------------
 router.post('/add', (req, res, next) => {
-    // Only allow logged-in users
     if (!req.session || !req.session.userId) {
-        return res.redirect("../users/login"); // relative redirect
+        return res.redirect('../users/login'); // redirect to login
     }
 
     // Sanitize inputs
@@ -61,10 +68,9 @@ router.post('/add', (req, res, next) => {
 
     db.query(sql, params, (err) => {
         if (err) return next(err);
-        // Redirect relative to router mount like users.js
-        res.redirect("../health"); 
+        // Redirect back to health list using relative path
+        res.redirect('.'); 
     });
 });
-
 
 module.exports = router;
