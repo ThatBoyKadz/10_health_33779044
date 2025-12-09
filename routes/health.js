@@ -37,22 +37,32 @@ router.get('/add', (req, res) => {
 });
 
 // Handle adding health record
-router.post('/add', (req, res) => {
+// Handle adding health record
+router.post('/add', (req, res, next) => {
+    // Only allow logged-in users
     if (!req.session || !req.session.userId) {
-        return res.send('You must be logged in to add a record.');
+        return res.redirect('/users/login');
     }
 
-    const { weight, height, blood_pressure, heart_rate } = req.body;
+    // Sanitize inputs
+    const weight = req.sanitize(req.body.weight);
+    const height = req.sanitize(req.body.height);
+    const blood_pressure = req.sanitize(req.body.blood_pressure);
+    const heart_rate = req.sanitize(req.body.heart_rate);
     const bmi = (weight / ((height / 100) ** 2)).toFixed(2);
 
-    db.query(
-        'INSERT INTO health_records (user_id, record_date, weight, height, bmi, blood_pressure, heart_rate) VALUES (?, NOW(), ?, ?, ?, ?, ?)',
-        [req.session.userId, weight, height, bmi, blood_pressure, heart_rate],
-        (err) => {
-            if (err) throw err;
-            res.redirect('/health');
-        }
-    );
+    const sql = `
+        INSERT INTO health_records 
+        (user_id, record_date, weight, height, bmi, blood_pressure, heart_rate)
+        VALUES (?, NOW(), ?, ?, ?, ?, ?)
+    `;
+    const params = [req.session.userId, weight, height, bmi, blood_pressure, heart_rate];
+
+    db.query(sql, params, (err) => {
+        if (err) return next(err);
+        res.redirect('/health');
+    });
 });
+
 
 module.exports = router;
