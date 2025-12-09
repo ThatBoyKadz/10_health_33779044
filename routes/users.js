@@ -2,19 +2,15 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 
-// --- Registration page ---
+// --- Show registration page ---
 router.get('/register', (req, res) => {
     res.render('users/register', { errors: [] });
 });
 
-// --- Handle registration ---
+// --- Handle registration form ---
 router.post('/register', async (req, res) => {
     const { username, password, first, last, email } = req.body;
     const db = req.db;
-
-    if (!username || !password || !first || !last || !email) {
-        return res.render('users/register', { errors: ['All fields are required'] });
-    }
 
     db.query(
         'SELECT * FROM users WHERE username = ? OR email = ?',
@@ -31,7 +27,7 @@ router.post('/register', async (req, res) => {
             db.query(
                 'INSERT INTO users (username, password, first, last, email) VALUES (?, ?, ?, ?, ?)',
                 [username, hashedPassword, first, last, email],
-                (err2) => {
+                (err2, results2) => {
                     if (err2) throw err2;
                     res.redirect('/users/login');
                 }
@@ -40,7 +36,7 @@ router.post('/register', async (req, res) => {
     );
 });
 
-// --- Login page ---
+// --- Show login page ---
 router.get('/login', (req, res) => {
     res.render('users/login', { errors: [] });
 });
@@ -64,6 +60,7 @@ router.post('/login', (req, res) => {
             return res.render('users/login', { errors: ['Invalid credentials'] });
         }
 
+        // Store user in session
         req.session.user = {
             id: user.id,
             username: user.username,
@@ -71,15 +68,17 @@ router.post('/login', (req, res) => {
             last: user.last
         };
 
-        // redirect to logged-in page
-        res.redirect('/users/loggedin');
+        res.redirect('/users/loggedin'); // Redirect to loggedin page
     });
 });
 
+// --- Logged-in page ---
 router.get('/loggedin', (req, res) => {
-    res.render('loggedin');
+    if (!req.session.user) {
+        return res.redirect('/users/login');
+    }
+    res.render('users/loggedin', { user: req.session.user });
 });
-
 
 // --- Logout ---
 router.get('/logout', (req, res) => {

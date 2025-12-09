@@ -1,69 +1,71 @@
+require('dotenv').config(); // Load environment variables
+
 const express = require('express');
-const session = require('express-session');
-const mysql = require('mysql2');
-const bodyParser = require('body-parser');
+const ejs = require('ejs');
 const path = require('path');
-
+const mysql = require('mysql2');
+const session = require('express-session');
+const expressSanitizer = require('express-sanitizer');
 const app = express();
+const port = 8000;
+const host = '0.0.0.0'; // Listen on all interfaces
 
-// --- Database setup ---
-const db = mysql.createPool({
-    host: 'localhost',
-    user: 'fitness_app_user',   // your DB user
-    password: 'strongpassword', // your DB password
-    database: 'health'          // your DB name
-});
+// -----------------
+// Middleware
+// -----------------
+app.use(express.urlencoded({ extended: true }));
+app.use(expressSanitizer());
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('view engine', 'ejs');
 
-// Make db accessible in routers
-app.use((req, res, next) => {
-    req.db = db;
-    next();
-});
-
-// --- Middleware ---
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-// --- Session setup ---
 app.use(session({
-    secret: 'superrandomstuff', 
+    secret: 'somerandomstuff',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: false,
+    cookie: { expires: 600000 }
 }));
 
-// Make session and appName available in all EJS templates
+// Make session available in all templates
 app.use((req, res, next) => {
     res.locals.session = req.session;
-    res.locals.appName = "Health & Fitness Hub";
     next();
 });
 
-// --- View engine ---
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+// -----------------
+// App locals
+// -----------------
+app.locals.appName = "Health & Fitness Hub";
+app.locals.shopData = { shopName: "Health & Fitness Hub" };
 
-// --- Static files ---
-app.use(express.static(path.join(__dirname, 'public')));
-
-// --- Routes ---
-const workoutsRouter = require('./routes/workouts');
-const usersRouter = require('./routes/users');
-
-app.use('/workouts', workoutsRouter);
-app.use('/users', usersRouter);
-
-// --- Home page ---
-app.get('/', (req, res) => {
-    res.render('index'); // index.ejs uses <%= appName %> and session
+// -----------------
+// Database
+// -----------------
+// Change host if your MySQL is on another machine
+const db = mysql.createPool({
+    host: 'localhost', // or the IP of your VM MySQL if remote
+    user: 'fitness_app_user',
+    password: 'strongpassword', // match your VM credentials
+    database: 'health',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
 });
+global.db = db;
 
-// --- About page ---
-app.get('/about', (req, res) => {
-    res.render('about'); // create about.ejs
-});
+// -----------------
+// Routes
+// -----------------
+const mainRoutes = require("./routes/main");
+app.use('/', mainRoutes);
 
-// --- Start server ---
-const PORT = 8000;
-app.listen(PORT, () => {
-    console.log(`Server listening on http://localhost:${PORT}`);
-});
+const usersRoutes = require('./routes/users');
+app.use('/users', usersRoutes);
+
+const workoutsRoutes = require('./routes/workouts');
+app.use('/workouts', workoutsRoutes);
+
+
+// -----------------
+// Start server
+// -----------------
+app.listen(port, host, () => console.log(`Server listening on http://${host}:${port}`));

@@ -1,14 +1,22 @@
-<title><%= appName %></title>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title><%= appName %></title>
+    <link rel="stylesheet" href="<%= basePath %>/main.css">
+</head>
+<body>
 <nav>
-    <a href="/">Home</a> |
-    <a href="/workouts/list">View Workouts</a> |
-    <a href="/workouts/add">Add Workout</a> |
-    <a href="/workouts/search">Search Workouts</a> |
-    <% if (!session.user) { %>
-        <a href="/users/login">Login</a> |
-        <a href="/users/register">Register</a>
+    <a href="<%= basePath %>/">Home</a> |
+    <a href="<%= basePath %>/about">About</a> |
+    <a href="<%= basePath %>/workouts/list">View Workouts</a> |
+    <a href="<%= basePath %>/workouts/add">Add Workout</a> |
+    <% if(!session.user) { %>
+        <a href="<%= basePath %>/users/login">Login</a> |
+        <a href="<%= basePath %>/users/register">Register</a>
     <% } else { %>
-        Welcome, <%= session.user.first %> |
-        <a href="/users/logout">Logout</a>
+        <a href="<%= basePath %>/users/loggedin">My Page</a> |
+        <a href="<%= basePath %>/users/logout">Logout</a>
     <% } %>
 </nav>
+<hr>
