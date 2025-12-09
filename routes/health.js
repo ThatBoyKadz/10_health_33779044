@@ -1,45 +1,30 @@
 const express = require('express');
 const router = express.Router();
 
-// ------------------------
-// Helper: Check if user is logged in
-// ------------------------
+// middleware to protect routes
 function isLoggedIn(req, res, next) {
     if (req.session.userId) next();
     else res.redirect('/users/login');
 }
 
-// ------------------------
-// GET: Show all health records
-// ------------------------
+// Show all health records (use a single flat view: health.ejs)
 router.get('/', isLoggedIn, (req, res) => {
     db.query(
         'SELECT * FROM health_records WHERE user_id = ?',
         [req.session.userId],
         (err, results) => {
             if (err) throw err;
-            res.render('health', {
-                records: results,
-                first: req.session.first || '',
-                last: req.session.last || '',
-            });
+            res.render('health', { records: results }); // render health.ejs
         }
     );
 });
 
-// ------------------------
-// GET: Add health record form
-// ------------------------
+// Add health record form
 router.get('/add', isLoggedIn, (req, res) => {
-    res.render('add_record', {
-        first: req.session.first || '',
-        last: req.session.last || ''
-    });
+    res.render('add_record'); // render add_record.ejs
 });
 
-// ------------------------
-// POST: Handle adding health record
-// ------------------------
+// Handle adding health record
 router.post('/add', isLoggedIn, (req, res) => {
     const { weight, height, blood_pressure, heart_rate } = req.body;
     const bmi = (weight / ((height / 100) ** 2)).toFixed(2);

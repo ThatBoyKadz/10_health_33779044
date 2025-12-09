@@ -46,7 +46,7 @@ router.post(
 
             db.query(sql, params, (err) => {
                 if (err) return next(err);
-                res.redirect(req.baseUrl + "/login");
+                res.redirect("/login");
             });
         });
     }
@@ -63,7 +63,7 @@ router.get("/login", (req, res) => {
 // POST: Handle Login
 // ------------------------
 router.post("/login", (req, res, next) => {
-    if (req.session.userId) return res.redirect(req.baseUrl + "/loggedin");
+    if (req.session.userId) return res.redirect("/loggedin");
 
     const usernameInput = req.sanitize(req.body.username);
     const passwordInput = req.sanitize(req.body.password);
@@ -85,7 +85,7 @@ router.post("/login", (req, res, next) => {
             req.session.first = user.first;
             req.session.last = user.last;
 
-            res.redirect(req.baseUrl + "/loggedin");
+            res.redirect("/loggedin");
         } else {
             res.render("login.ejs", { errors: [{ msg: "Incorrect password" }] });
         }
@@ -96,12 +96,12 @@ router.post("/login", (req, res, next) => {
 // GET: Logout
 // ------------------------
 router.get("/logout", (req, res) => {
-    if (!req.session.userId) return res.redirect(req.baseUrl + "/login");
+    if (!req.session.userId) return res.redirect("/login");
 
     req.session.destroy(err => {
-        if (err) return res.redirect(req.baseUrl + "/loggedin");
+        if (err) return res.redirect("/loggedin");
         res.clearCookie("connect.sid");
-        res.redirect(req.baseUrl + "/login");
+        res.redirect("/login");
     });
 });
 
@@ -109,7 +109,7 @@ router.get("/logout", (req, res) => {
 // GET: Logged In Page
 // ------------------------
 router.get("/loggedin", (req, res) => {
-    if (!req.session.userId) return res.redirect(req.baseUrl + "/login");
+    if (!req.session.userId) return res.redirect("/login");
 
     res.render("loggedin.ejs", {
         username: req.session.username,
