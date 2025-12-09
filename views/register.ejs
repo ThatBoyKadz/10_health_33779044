@@ -75,7 +75,7 @@
 <div class="register-container">
     <h2>Create an Account</h2>
 
-    <% if (errors && errors.length > 0) { %>
+    <% if (errors.length > 0) { %>
         <div class="errors">
             <ul>
                 <% errors.forEach(error => { %>
@@ -85,25 +85,25 @@
         </div>
     <% } %>
 
-    <form action="<%= req.baseUrl %>/register" method="POST">
+    <form action="/users/register" method="POST">
         <div>
             <label for="first">First Name</label>
-            <input type="text" name="first" id="first" value="<%= oldInput ? oldInput.first : '' %>" required>
+            <input type="text" name="first" id="first" value="<%= oldInput.first ? oldInput.first : '' %>" required>
         </div>
 
         <div>
             <label for="last">Last Name</label>
-            <input type="text" name="last" id="last" value="<%= oldInput ? oldInput.last : '' %>" required>
+            <input type="text" name="last" id="last" value="<%= oldInput.last ? oldInput.last : '' %>" required>
         </div>
 
         <div>
             <label for="username">Username</label>
-            <input type="text" name="username" id="username" value="<%= oldInput ? oldInput.username : '' %>" required>
+            <input type="text" name="username" id="username" value="<%= oldInput.username ? oldInput.username : '' %>" required>
         </div>
 
         <div>
             <label for="email">Email</label>
-            <input type="email" name="email" id="email" value="<%= oldInput ? oldInput.email : '' %>" required>
+            <input type="email" name="email" id="email" value="<%= oldInput.email ? oldInput.email : '' %>" required>
         </div>
 
         <div>
@@ -114,7 +114,7 @@
         <button type="submit">Register</button>
     </form>
 
-    <a href="<%= req.baseUrl %>/login" class="login-link">Already have an account? Login here</a>
+    <a href="/users/login" class="login-link">Already have an account? Login here</a>
 </div>
 
 </body>

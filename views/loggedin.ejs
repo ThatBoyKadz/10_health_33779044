@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome - Health Tracker</title>
+    <title>Logged In - Health Tracker</title>
     <link rel="stylesheet" href="/css/styles.css">
     <style>
         body {
@@ -15,12 +15,11 @@
             min-height: 100vh;
             margin: 0;
         }
-        .welcome-container {
+        .container {
             background: white;
             padding: 2rem;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            width: 100%;
             max-width: 500px;
             text-align: center;
         }
@@ -28,41 +27,32 @@
             color: #4CAF50;
             margin-bottom: 1rem;
         }
-        p {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-        }
-        a {
-            color: #4CAF50;
+        a.button {
+            display: block;
+            margin: 0.5rem auto;
+            padding: 0.7rem 1.5rem;
+            background: #4CAF50;
+            color: white;
             text-decoration: none;
-            margin: 0 0.5rem;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .message {
-            background: #e6ffe6;
-            border: 1px solid #4CAF50;
-            padding: 0.5rem;
             border-radius: 5px;
-            margin-bottom: 1rem;
+            font-weight: bold;
+            width: fit-content;
+        }
+        a.button.logout {
+            background: #f44336;
         }
     </style>
 </head>
 <body>
 
-<div class="welcome-container">
+<div class="container">
     <h2>Welcome, <%= first %> <%= last %>!</h2>
+    <p>You are logged in as <strong><%= username %></strong>.</p>
 
-    <% if (message) { %>
-        <div class="message"><%= message %></div>
-    <% } %>
-
-    <p>
-        <a href="<%= req.baseUrl %>/logout">Logout</a> |
-        <a href="/health">My Health Records</a> |
-        <a href="/">Home</a>
-    </p>
+    <a class="button" href="/health/add">Add New Health Record</a>
+    <a class="button" href="/health">View Health Records</a>
+    <a class="button logout" href="/users/logout">Logout</a>
+    <a class="button" href="/">return home</a>
 </div>
 
 </body>
