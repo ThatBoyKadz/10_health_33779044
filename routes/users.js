@@ -1,32 +1,14 @@
-// routes/users.js
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-
-// express-validator
 const { check, validationResult } = require("express-validator");
-
-// ------------------------
-// Middleware: Protect routes
-// ------------------------
-const redirectLogin = (req, res, next) => {
-    if (!req.session.userId) {
-        // Redirect to login relative to baseUrl
-        res.redirect(req.baseUrl + "/login");
-    } else {
-        next();
-    }
-};
 
 // ------------------------
 // GET: Registration Page
 // ------------------------
 router.get("/register", (req, res) => {
-    res.render("register.ejs", { 
-        errors: [], 
-        oldInput: {} 
-    });
+    res.render("register.ejs", { errors: [], oldInput: {} });
 });
 
 // ------------------------
@@ -44,13 +26,9 @@ router.post(
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.render("register.ejs", {
-                errors: errors.array(),
-                oldInput: req.body
-            });
+            return res.render("register.ejs", { errors: errors.array(), oldInput: req.body });
         }
 
-        // Sanitize inputs
         const username = req.sanitize(req.body.username);
         const password = req.sanitize(req.body.password);
         const first = req.sanitize(req.body.first);
@@ -66,9 +44,8 @@ router.post(
             `;
             const params = [username, first, last, email, hashedPassword];
 
-            db.query(sql, params, (err, result) => {
+            db.query(sql, params, (err) => {
                 if (err) return next(err);
-                // Redirect to login page relative to baseUrl
                 res.redirect(req.baseUrl + "/login");
             });
         });
@@ -86,6 +63,8 @@ router.get("/login", (req, res) => {
 // POST: Handle Login
 // ------------------------
 router.post("/login", (req, res, next) => {
+    if (req.session.userId) return res.redirect(req.baseUrl + "/loggedin");
+
     const usernameInput = req.sanitize(req.body.username);
     const passwordInput = req.sanitize(req.body.password);
 
@@ -106,7 +85,6 @@ router.post("/login", (req, res, next) => {
             req.session.first = user.first;
             req.session.last = user.last;
 
-            // Redirect to loggedin page relative to baseUrl
             res.redirect(req.baseUrl + "/loggedin");
         } else {
             res.render("login.ejs", { errors: [{ msg: "Incorrect password" }] });
@@ -115,9 +93,11 @@ router.post("/login", (req, res, next) => {
 });
 
 // ------------------------
-// GET: Logout (protected)
+// GET: Logout
 // ------------------------
-router.get("/logout", redirectLogin, (req, res) => {
+router.get("/logout", (req, res) => {
+    if (!req.session.userId) return res.redirect(req.baseUrl + "/login");
+
     req.session.destroy(err => {
         if (err) return res.redirect(req.baseUrl + "/loggedin");
         res.clearCookie("connect.sid");
@@ -126,9 +106,11 @@ router.get("/logout", redirectLogin, (req, res) => {
 });
 
 // ------------------------
-// GET: Logged In Page (protected)
+// GET: Logged In Page
 // ------------------------
-router.get("/loggedin", redirectLogin, (req, res) => {
+router.get("/loggedin", (req, res) => {
+    if (!req.session.userId) return res.redirect(req.baseUrl + "/login");
+
     res.render("loggedin.ejs", {
         username: req.session.username,
         first: req.session.first,
