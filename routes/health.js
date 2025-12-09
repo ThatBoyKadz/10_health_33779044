@@ -16,11 +16,18 @@ function isLoggedIn(req, res, next) {
 // ------------------------
 // GET: Show all health records
 // ------------------------
+// GET: Show all health records
 router.get('/', isLoggedIn, (req, res) => {
     const sql = 'SELECT * FROM health_records WHERE user_id = ?';
     db.query(sql, [req.session.userId], (err, results) => {
         if (err) return res.status(500).send('Database error');
-        res.render('health', { records: results });
+
+        // Pass first and last from session to EJS
+        res.render('health', { 
+            records: results,
+            first: req.session.first,
+            last: req.session.last
+        });
     });
 });
 
