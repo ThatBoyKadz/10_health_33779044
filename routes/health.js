@@ -38,10 +38,11 @@ router.get('/add', (req, res) => {
 
 // Handle adding health record
 // Handle adding health record
+// Handle adding health record
 router.post('/add', (req, res, next) => {
     // Only allow logged-in users
     if (!req.session || !req.session.userId) {
-        return res.redirect('/users/login');
+        return res.redirect("../users/login"); // relative redirect
     }
 
     // Sanitize inputs
@@ -60,7 +61,8 @@ router.post('/add', (req, res, next) => {
 
     db.query(sql, params, (err) => {
         if (err) return next(err);
-        res.redirect('/health');
+        // Redirect relative to router mount like users.js
+        res.redirect("../health"); 
     });
 });
 
