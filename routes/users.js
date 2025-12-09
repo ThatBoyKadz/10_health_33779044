@@ -12,7 +12,8 @@ const { check, validationResult } = require("express-validator");
 // ------------------------
 const redirectLogin = (req, res, next) => {
     if (!req.session.userId) {
-        res.redirect(req.baseUrl + "/login"); // use baseUrl
+        // Redirect to login relative to baseUrl
+        res.redirect(req.baseUrl + "/login");
     } else {
         next();
     }
@@ -67,8 +68,7 @@ router.post(
 
             db.query(sql, params, (err, result) => {
                 if (err) return next(err);
-
-                // Redirect to login after registration using baseUrl
+                // Redirect to login page relative to baseUrl
                 res.redirect(req.baseUrl + "/login");
             });
         });
@@ -106,7 +106,7 @@ router.post("/login", (req, res, next) => {
             req.session.first = user.first;
             req.session.last = user.last;
 
-            // Use baseUrl so it works on subpaths
+            // Redirect to loggedin page relative to baseUrl
             res.redirect(req.baseUrl + "/loggedin");
         } else {
             res.render("login.ejs", { errors: [{ msg: "Incorrect password" }] });
