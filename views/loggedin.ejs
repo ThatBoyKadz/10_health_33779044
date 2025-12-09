@@ -30,39 +30,29 @@
         }
         p {
             margin-bottom: 1rem;
-            font-size: 1rem;
         }
-        a {
-            color: #4CAF50;
+        a.button {
+            display: inline-block;
+            margin: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: #4CAF50;
+            color: white;
             text-decoration: none;
-            margin: 0 0.5rem;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .message {
-            background: #e6ffe6;
-            border: 1px solid #4CAF50;
-            padding: 0.5rem;
             border-radius: 5px;
-            margin-bottom: 1rem;
+        }
+        a.button:hover {
+            background: #45a049;
         }
     </style>
 </head>
 <body>
 
 <div class="welcome-container">
-    <h2>Welcome, <%= first %> <%= last %>!</h2>
+    <h2>Welcome, <%= first || '' %> <%= last || '' %>!</h2>
+    <p><%= message %></p>
 
-    <% if (message) { %>
-        <div class="message"><%= message %></div>
-    <% } %>
-
-    <p>
-        <a href="<%= req.baseUrl %>/logout">Logout</a> |
-        <a href="/health">My Health Records</a> |
-        <a href="/">Home</a>
-    </p>
+    <a href="<%= req.baseUrl.replace('/users','/health') %>" class="button">View My Health Records</a>
+    <a href="<%= req.baseUrl %>/logout" class="button">Logout</a>
 </div>
 
 </body>
