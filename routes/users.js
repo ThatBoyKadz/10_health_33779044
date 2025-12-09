@@ -12,7 +12,7 @@ const { check, validationResult } = require("express-validator");
 // ------------------------
 const redirectLogin = (req, res, next) => {
     if (!req.session.userId) {
-        res.redirect("/users/login");
+        res.redirect(req.baseUrl + "/login"); // use baseUrl
     } else {
         next();
     }
@@ -67,8 +67,9 @@ router.post(
 
             db.query(sql, params, (err, result) => {
                 if (err) return next(err);
-                // Redirect to login after registration
-                res.redirect("/users/login");
+
+                // Redirect to login after registration using baseUrl
+                res.redirect(req.baseUrl + "/login");
             });
         });
     }
@@ -105,8 +106,8 @@ router.post("/login", (req, res, next) => {
             req.session.first = user.first;
             req.session.last = user.last;
 
-            // Redirect to loggedin.ejs instead of dashboard
-            res.redirect("/users/loggedin");
+            // Use baseUrl so it works on subpaths
+            res.redirect(req.baseUrl + "/loggedin");
         } else {
             res.render("login.ejs", { errors: [{ msg: "Incorrect password" }] });
         }
@@ -118,9 +119,9 @@ router.post("/login", (req, res, next) => {
 // ------------------------
 router.get("/logout", redirectLogin, (req, res) => {
     req.session.destroy(err => {
-        if (err) return res.redirect("/users/loggedin");
+        if (err) return res.redirect(req.baseUrl + "/loggedin");
         res.clearCookie("connect.sid");
-        res.redirect("/users/login");
+        res.redirect(req.baseUrl + "/login");
     });
 });
 
