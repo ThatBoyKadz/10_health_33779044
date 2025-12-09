@@ -75,7 +75,7 @@
 <div class="login-container">
     <h2>Login to Health Tracker</h2>
 
-    <% if (errors.length > 0) { %>
+    <% if (errors && errors.length > 0) { %>
         <div class="errors">
             <ul>
                 <% errors.forEach(error => { %>
@@ -85,10 +85,10 @@
         </div>
     <% } %>
 
-    <form action="/users/login" method="POST">
+    <form action="<%= req.baseUrl %>/login" method="POST">
         <div>
             <label for="username">Username</label>
-            <input type="text" name="username" id="username" required>
+            <input type="text" name="username" id="username" value="<%= oldInput ? oldInput.username : '' %>" required>
         </div>
 
         <div>
@@ -99,7 +99,7 @@
         <button type="submit">Login</button>
     </form>
 
-    <a href="/users/register" class="register-link">Don't have an account? Register here</a>
+    <a href="<%= req.baseUrl %>/register" class="register-link">Don't have an account? Register here</a>
 </div>
 
 </body>
