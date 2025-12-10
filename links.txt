@@ -1,0 +1,6 @@
+home=https://doc.gold.ac.uk/usr/139/
+about=https://doc.gold.ac.uk/usr/139/about
+login=https://doc.gold.ac.uk/usr/139/users/login
+register=https://doc.gold.ac.uk/usr/139/users/register
+add_record=https://doc.gold.ac.uk/usr/139/health/add
+view_health_records=https://doc.gold.ac.uk/usr/139/health
