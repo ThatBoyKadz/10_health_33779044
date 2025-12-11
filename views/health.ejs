@@ -15,6 +15,22 @@
         <a href="<%= addUrl %>">Add New Record</a>
     </p>
 
+    <!-- 🔍 Search Bar -->
+    <form method="GET" action="/health/search" style="margin-bottom: 20px;">
+        <input 
+            type="text" 
+            name="q" 
+            placeholder="Search weight, height, BP, HR..."
+            style="padding: 5px; width: 250px;"
+            required
+        >
+        <button type="submit" style="padding: 5px 10px;">Search</button>
+    </form>
+
+    <% if (message) { %>
+        <p><%= message %></p>
+    <% } %>
+
     <% if (records.length === 0) { %>
         <p>No health records yet.</p>
     <% } else { %>

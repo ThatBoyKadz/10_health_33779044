@@ -34,6 +34,54 @@ router.get('/', (req, res) => {
     );
 });
 
+
+// ------------------------
+// GET: Search health records
+// ------------------------
+router.get('/search', (req, res) => {
+    if (!req.session || !req.session.userId) {
+        return res.render('health', { 
+            records: [],
+            first: '',
+            last: '',
+            message: 'Please log in to search your health records.',
+            logoutUrl: '/users/logout',
+            addUrl: '/health/add'
+        });
+    }
+
+    const q = req.sanitize(req.query.q);
+
+    // We allow searching in basic fields
+    const sql = `
+        SELECT * FROM health_records 
+        WHERE user_id = ? AND (
+            weight LIKE ? OR
+            height LIKE ? OR
+            blood_pressure LIKE ? OR
+            heart_rate LIKE ?
+        )
+    `;
+
+    const like = `%${q}%`;
+
+    db.query(sql, [req.session.userId, like, like, like, like], (err, results) => {
+        if (err) throw err;
+
+        res.render('health', {
+            records: results,
+            first: req.session.first || '',
+            last: req.session.last || '',
+            message: results.length === 0 ? 'No records found.' : '',
+            logoutUrl: '/users/logout',
+            addUrl: '/health/add'
+        });
+    });
+});
+
+
+
+
 // ------------------------
 // GET: Add health record form
 // ------------------------
